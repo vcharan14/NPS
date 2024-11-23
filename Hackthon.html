@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Strength Checker</title>
+    <style>
+        /* Background styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        /* Title styling */
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        /* Input styling */
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="password"]:focus {
+            border-color: #66a6ff;
+            box-shadow: 0 0 8px rgba(102, 166, 255, 0.3);
+            outline: none;
+        }
+
+        /* Button styling */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e90ff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #007acc;
+            transform: scale(1.05);
+        }
+
+        /* Message styles based on strength */
+        #strengthMessage {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .weak {
+            color: #ff6b6b;
+        }
+
+        .medium {
+            color: #ffae42;
+        }
+
+        .strong {
+            color: #1dd1a1;
+        }
+
+        /* Suggestion styling */
+        #suggestion {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f1f8ff;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Strength Checker</h1>
+        <input type="password" id="passwordInput" placeholder="Enter your password" />
+        <button id="checkButton">Check Strength</button>
+        <div id="strengthMessage"></div>
+        <div id="suggestion"></div>
+    </div>
+
+    <script>
+        document.getElementById('checkButton').addEventListener('click', function() {
+            const password = document.getElementById('passwordInput').value;
+            const strengthMessage = document.getElementById('strengthMessage');
+            const suggestionMessage = document.getElementById('suggestion');
+            let strength = 'Weak';
+            let message = '';
+
+            // Criteria
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const isLongEnough = password.length >= 8;
+
+            // Determine strength
+            const criteriaMet = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChars, isLongEnough].filter(Boolean).length;
+
+            if (criteriaMet < 3) {
+                strength = 'Weak';
+                message = 'Your password is too weak. It should have at least 8 characters, including uppercase, lowercase, numbers, and special characters.';
+                strengthMessage.className = 'weak';
+                suggestionMessage.textContent = `Suggested Password: ${updatePassword(password)}`;
+            } else if (criteriaMet === 3) {
+                strength = 'Medium';
+                message = 'Your password is medium strength. Consider adding more complexity.';
+                strengthMessage.className = 'medium';
+                suggestionMessage.textContent = `Suggested Password: ${updatePassword(password)}`;
+            } else {
+                strength = 'Strong';
+                message = 'Your password is strong! Good job!';
+                strengthMessage.className = 'strong';
+                suggestionMessage.textContent = ''; // No suggestion for strong passwords
+            }
+
+            strengthMessage.textContent = `Strength: ${strength}. ${message}`;
+        });
+
+        function updatePassword(password) {
+            let updatedPassword = password.split('');
+
+            // Ensure at least one uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                updatedPassword[0] = 'A'; // Replace first character with an uppercase letter
+            }
+            // Ensure at least one lowercase letter
+            if (!/[a-z]/.test(password)) {
+                updatedPassword[1] = 'a'; // Replace second character with a lowercase letter
+            }
+            // Ensure at least one number
+            if (!/\d/.test(password)) {
+                updatedPassword[2] = '1'; // Replace third character with a number
+            }
+            // Ensure at least one special character
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                updatedPassword[3] = '!'; // Replace fourth character with a special character
+            }
+            // Ensure minimum length of 8 characters
+            while (updatedPassword.length < 8) {
+                updatedPassword.push('x'); // Filling with a placeholder character
+            }
+
+            // Shuffle the updated password to ensure randomness
+            return updatedPassword.join('');
+        }
+    </script>
+</body>
+</html>
